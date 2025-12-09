@@ -1,0 +1,111 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:LinuxCommandCenter.ViewModels"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             x:Class="LinuxCommandCenter.Views.SystemToolsView"
+             x:DataType="vm:SystemToolsViewModel">
+
+  <Grid RowDefinitions="Auto,*">
+    <!-- Header -->
+    <StackPanel Orientation="Vertical" Spacing="4">
+      <TextBlock Text="System tools"
+                 FontSize="22"
+                 FontWeight="SemiBold"
+                 Foreground="#111827"/>
+      <TextBlock Text="Inspect system health and resources with curated tools."
+                 FontSize="13"
+                 Foreground="#6B7280"/>
+    </StackPanel>
+
+    <!-- Content -->
+    <Grid Grid.Row="1"
+          Margin="0,16,0,0"
+          RowDefinitions="Auto,*"
+          RowSpacing="12">
+
+      <!-- Tool buttons -->
+      <Border Background="#F3F4F6"
+              CornerRadius="18"
+              Padding="12">
+        <WrapPanel>
+          <Button Content="System summary"
+                  Margin="4"
+                  Command="{Binding RunToolCommand}"
+                  CommandParameter="sys-summary"/>
+          <Button Content="Disk usage"
+                  Margin="4"
+                  Command="{Binding RunToolCommand}"
+                  CommandParameter="disk-usage"/>
+          <Button Content="Memory"
+                  Margin="4"
+                  Command="{Binding RunToolCommand}"
+                  CommandParameter="memory"/>
+          <Button Content="Top processes"
+                  Margin="4"
+                  Command="{Binding RunToolCommand}"
+                  CommandParameter="top-processes"/>
+          <Button Content="Running services"
+                  Margin="4"
+                  Command="{Binding RunToolCommand}"
+                  CommandParameter="services"/>
+          <Button Content="Network overview"
+                  Margin="4"
+                  Command="{Binding RunToolCommand}"
+                  CommandParameter="network"/>
+          <Button Content="Journal tail"
+                  Margin="4"
+                  Command="{Binding RunToolCommand}"
+                  CommandParameter="journal"/>
+        </WrapPanel>
+      </Border>
+
+      <!-- Output -->
+      <Border Grid.Row="1"
+              Background="White"
+              CornerRadius="18"
+              Padding="16">
+        <Grid RowDefinitions="Auto,Auto,*,Auto"
+              RowSpacing="8">
+          <TextBlock Text="{Binding ActiveToolTitle}"
+                     FontSize="16"
+                     FontWeight="SemiBold"
+                     Foreground="#111827"/>
+
+          <StackPanel Grid.Row="1"
+                      Orientation="Horizontal"
+                      Spacing="8">
+            <ProgressBar Width="120"
+                         IsIndeterminate="True"
+                         IsVisible="{Binding IsBusy}"/>
+            <TextBlock Text="{Binding Status}"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       Foreground="#6B7280"/>
+          </StackPanel>
+
+          <Border Grid.Row="2"
+                  Background="#F9FAFB"
+                  CornerRadius="12"
+                  Padding="10">
+            <ScrollViewer>
+              <TextBlock Text="{Binding Output}"
+                         FontFamily="Consolas, Menlo, monospace"
+                         FontSize="12"
+                         TextWrapping="Wrap"/>
+            </ScrollViewer>
+          </Border>
+
+          <TextBlock Grid.Row="3"
+                     Text="Most tools are read-only and safe to run, but may require elevated permissions on some systems."
+                     FontSize="11"
+                     Foreground="#9CA3AF"
+                     TextWrapping="Wrap"/>
+        </Grid>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>

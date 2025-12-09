@@ -1,0 +1,111 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:LinuxCommandCenter.ViewModels"
+        mc:Ignorable="d"
+        x:Class="LinuxCommandCenter.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="1100"
+        Height="700"
+        MinWidth="900"
+        MinHeight="600"
+        Title="Linux Command Center"
+        Background="Transparent">
+
+  <Window.Styles>
+    <!-- Navigation item appearance -->
+    <Style Selector="ListBox#NavigationListBox > ListBoxItem:selected">
+      <Setter Property="Background" Value="#111827"/>
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <Style Selector="ListBox#NavigationListBox > ListBoxItem">
+      <Setter Property="Padding" Value="10,8"/>
+      <Setter Property="Margin" Value="0,4"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+  </Window.Styles>
+
+  <Grid>
+    <Grid.Background>
+      <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#020617" Offset="0"/>
+        <GradientStop Color="#0F172A" Offset="0.5"/>
+        <GradientStop Color="#111827" Offset="1"/>
+      </LinearGradientBrush>
+    </Grid.Background>
+
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="260"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+
+    <!-- Navigation panel -->
+    <Border Grid.Column="0"
+            Margin="20"
+            CornerRadius="18"
+            Background="#02061780">
+      <Grid RowDefinitions="Auto,*,Auto"
+            Margin="20">
+
+        <!-- Logo / title -->
+        <StackPanel Orientation="Vertical" Spacing="4">
+          <TextBlock Text="Linux Command Center"
+                     FontSize="20"
+                     FontWeight="SemiBold"
+                     Foreground="White"/>
+          <TextBlock Text="Friendly wrapper for powerful commands"
+                     FontSize="12"
+                     Foreground="#9CA3AF"/>
+        </StackPanel>
+
+        <!-- Navigation items -->
+        <ListBox Grid.Row="1"
+                 x:Name="NavigationListBox"
+                 Margin="0,24,0,24"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 ItemsSource="{Binding NavigationItems}"
+                 SelectedItem="{Binding SelectedNavigationItem}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:NavigationItemViewModel">
+              <StackPanel Orientation="Vertical">
+                <TextBlock Text="{Binding Title}"
+                           FontWeight="SemiBold"
+                           FontSize="14"/>
+                <TextBlock Text="{Binding Subtitle}"
+                           FontSize="11"
+                           Foreground="#9CA3AF"
+                           TextWrapping="Wrap"/>
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Footer -->
+        <StackPanel Grid.Row="2"
+                    Orientation="Vertical"
+                    Spacing="4">
+          <Separator Margin="0,0,0,8"/>
+          <TextBlock Text="Safe by design"
+                     Foreground="#6B7280"
+                     FontSize="11"/>
+          <TextBlock Text="{Binding AppVersion}"
+                     Foreground="#9CA3AF"
+                     FontSize="11"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Content area -->
+    <Border Grid.Column="1"
+            Margin="0,20,20,20"
+            CornerRadius="26"
+            Background="#F9FAFB">
+      <Grid Margin="24">
+        <ContentControl Content="{Binding CurrentViewModel}"/>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

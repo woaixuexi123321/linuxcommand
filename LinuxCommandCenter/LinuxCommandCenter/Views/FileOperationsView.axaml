@@ -1,0 +1,170 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:LinuxCommandCenter.ViewModels"
+             xmlns:m="clr-namespace:LinuxCommandCenter.Models"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             x:Class="LinuxCommandCenter.Views.FileOperationsView"
+             x:DataType="vm:FileOperationsViewModel">
+
+  <Grid RowDefinitions="Auto,*">
+    <!-- Header -->
+    <StackPanel Orientation="Vertical" Spacing="4">
+      <TextBlock Text="File operations"
+                 FontSize="22"
+                 FontWeight="SemiBold"
+                 Foreground="#111827"/>
+      <TextBlock Text="Perform common file tasks safely from a simple form."
+                 FontSize="13"
+                 Foreground="#6B7280"/>
+    </StackPanel>
+
+    <!-- Content -->
+    <Grid Grid.Row="1"
+          Margin="0,16,0,0"
+          ColumnDefinitions="2*,3*"
+          ColumnSpacing="16">
+
+      <!-- Form -->
+      <Border Background="#F3F4F6"
+              CornerRadius="18"
+              Padding="16">
+        <Grid RowDefinitions="Auto,Auto,Auto,*,Auto"
+              RowSpacing="12">
+          <!-- Operation -->
+          <StackPanel Orientation="Vertical" Spacing="4">
+            <TextBlock Text="Operation"
+                       FontSize="12"
+                       Foreground="#6B7280"/>
+            <ComboBox ItemsSource="{Binding AvailableOperations}"
+                      SelectedItem="{Binding SelectedOperation}"
+                      Background="White">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="m:FileOperationType">
+                  <TextBlock Text="{Binding .}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
+          <!-- Source -->
+          <StackPanel Grid.Row="1"
+                      Orientation="Vertical"
+                      Spacing="4">
+            <TextBlock Text="Source path"
+                       FontSize="12"
+                       Foreground="#6B7280"/>
+            <TextBox Text="{Binding SourcePath, UpdateSourceTrigger=PropertyChanged}"
+                     Background="White"
+                     Watermark="/home/user/source"/>
+          </StackPanel>
+
+          <!-- Destination -->
+          <StackPanel Grid.Row="2"
+                      Orientation="Vertical"
+                      Spacing="4">
+            <TextBlock Text="Destination or archive path"
+                       FontSize="12"
+                       Foreground="#6B7280"/>
+            <TextBox Text="{Binding DestinationPath, UpdateSourceTrigger=PropertyChanged}"
+                     Background="White"
+                     Watermark="/home/user/target or archive.tar.gz"/>
+          </StackPanel>
+
+          <!-- Options -->
+          <StackPanel Grid.Row="3"
+                      Orientation="Vertical"
+                      Spacing="6">
+            <TextBlock Text="Options"
+                       FontSize="12"
+                       Foreground="#6B7280"/>
+            <StackPanel Orientation="Vertical"
+                        Spacing="4">
+              <CheckBox Content="Include subdirectories (recursive)"
+                        IsChecked="{Binding IncludeSubdirectories}"/>
+              <CheckBox Content="Overwrite existing files"
+                        IsChecked="{Binding OverwriteExisting}"/>
+              <CheckBox Content="I understand that delete cannot be undone"
+                        IsChecked="{Binding DeleteConfirmation}"
+                        IsVisible="{Binding IsDeleteOperation}"/>
+            </StackPanel>
+          </StackPanel>
+
+          <!-- Preview and run -->
+          <StackPanel Grid.Row="4"
+                      Orientation="Vertical"
+                      Spacing="6">
+            <TextBlock Text="Command preview"
+                       FontSize="12"
+                       Foreground="#6B7280"/>
+            <Border Background="#111827"
+                    CornerRadius="8"
+                    Padding="8">
+              <TextBlock Text="{Binding CommandPreview}"
+                         FontFamily="Consolas, Menlo, monospace"
+                         Foreground="#E5E7EB"
+                         TextWrapping="Wrap"/>
+            </Border>
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Margin="0,8,0,0"
+                        Spacing="8">
+              <ProgressBar Width="120"
+                           IsIndeterminate="True"
+                           IsVisible="{Binding IsBusy}"/>
+              <Button Content="Run operation"
+                      Padding="16,6"
+                      Command="{Binding ExecuteOperationCommand}"
+                      Background="#059669"
+                      Foreground="White"
+                      BorderBrush="#047857"
+                      BorderThickness="1"/>
+            </StackPanel>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- Output -->
+      <Border Grid.Column="1"
+              Background="White"
+              CornerRadius="18"
+              Padding="16">
+        <Grid RowDefinitions="Auto,*,Auto"
+              RowSpacing="8">
+          <TextBlock Text="Last result"
+                     FontSize="12"
+                     Foreground="#6B7280"/>
+
+          <TabControl Grid.Row="1">
+            <TabItem Header="Standard output">
+              <ScrollViewer Margin="4">
+                <TextBlock Text="{Binding Output}"
+                           FontFamily="Consolas, Menlo, monospace"
+                           FontSize="12"
+                           TextWrapping="Wrap"/>
+              </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Error output">
+              <ScrollViewer Margin="4">
+                <TextBlock Text="{Binding Error}"
+                           FontFamily="Consolas, Menlo, monospace"
+                           Foreground="#B91C1C"
+                           FontSize="12"
+                           TextWrapping="Wrap"/>
+              </ScrollViewer>
+            </TabItem>
+          </TabControl>
+
+          <TextBlock Grid.Row="2"
+                     Text="{Binding Status}"
+                     FontSize="12"
+                     Foreground="#6B7280"/>
+        </Grid>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>
