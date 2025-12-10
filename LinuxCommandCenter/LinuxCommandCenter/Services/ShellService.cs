@@ -17,12 +17,24 @@ namespace LinuxCommandCenter.Services
 
             try
             {
-                var stopwatch = Stopwatch.StartNew();
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+                // 处理工作目录中的~符号
+                var actualWorkingDirectory = workingDirectory;
+                if (!string.IsNullOrEmpty(actualWorkingDirectory) && actualWorkingDirectory.Contains("~"))
+                {
+                    var homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    actualWorkingDirectory = actualWorkingDirectory.Replace("~", homePath);
+                }
+
+                // 如果未指定工作目录，使用用户主目录
+                actualWorkingDirectory ??= Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
                 var escapedArgs = command.Replace("\"", "\\\"");
 
-                using var process = new Process
+                using var process = new System.Diagnostics.Process
                 {
-                    StartInfo = new ProcessStartInfo
+                    StartInfo = new System.Diagnostics.ProcessStartInfo
                     {
                         FileName = useSudo ? "sudo" : "/bin/bash",
                         Arguments = useSudo ? $"-S bash -c \"{escapedArgs}\"" : $"-c \"{escapedArgs}\"",
@@ -31,7 +43,7 @@ namespace LinuxCommandCenter.Services
                         RedirectStandardInput = true,
                         UseShellExecute = false,
                         CreateNoWindow = true,
-                        WorkingDirectory = workingDirectory ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+                        WorkingDirectory = actualWorkingDirectory
                     }
                 };
 
@@ -39,8 +51,8 @@ namespace LinuxCommandCenter.Services
 
                 if (useSudo)
                 {
-                    // In a real application, you would securely get the password
-                    // For now, we'll assume sudo doesn't require password or it's configured with NOPASSWD
+                    // 注意：在实际应用中，需要安全地获取sudo密码
+                    // 这里假设sudo已配置为不需要密码或使用NOPASSWD
                     await process.StandardInput.WriteLineAsync();
                     await process.StandardInput.FlushAsync();
                 }
@@ -65,7 +77,6 @@ namespace LinuxCommandCenter.Services
 
             return result;
         }
-
         public async Task<CommandResult> TestConnectionAsync()
         {
             return await ExecuteCommandAsync("echo 'Connection Test Successful' && whoami && hostname");

@@ -21,8 +21,9 @@ namespace LinuxCommandCenter.ViewModels
         public ObservableCollection<CommandPreset> FilteredPresets { get; } = new();
         public ObservableCollection<CommandResult> CommandHistory { get; } = new();
 
+        // 命令属性 - 注意：ExecutePresetCommand 是 AsyncRelayCommand<object?> 类型
         public AsyncRelayCommand ExecuteCustomCommandCommand { get; }
-        public AsyncRelayCommand ExecutePresetCommand { get; }
+        public AsyncRelayCommand<object?> ExecutePresetCommand { get; }
         public AsyncRelayCommand ClearHistoryCommand { get; }
 
         public string CustomCommand
@@ -49,7 +50,7 @@ namespace LinuxCommandCenter.ViewModels
             set
             {
                 SetField(ref _searchTerm, value);
-                FilterPresets();
+                FilterPresets(); // 搜索词改变时自动过滤
             }
         }
 
@@ -61,17 +62,28 @@ namespace LinuxCommandCenter.ViewModels
 
         public QuickCommandsViewModel()
         {
+            // 初始化步骤必须按顺序执行：
+            // 1. 初始化预设命令集合
             InitializePresets();
+
+            // 2. 初始化命令（确保在InitializePresets之后）
+            ExecuteCustomCommandCommand = new AsyncRelayCommand(ExecuteCustomCommandAsync);
+            ExecutePresetCommand = new AsyncRelayCommand<object?>(ExecutePresetCommandAsync);
+            ClearHistoryCommand = new AsyncRelayCommand(ClearHistoryAsync);
+
+            // 3. 最后填充过滤列表（确保在InitializePresets之后）
             FilterPresets();
 
-            ExecuteCustomCommandCommand = new AsyncRelayCommand(ExecuteCustomCommandAsync);
-            ExecutePresetCommand = new AsyncRelayCommand(ExecutePresetCommandAsync);
-            ClearHistoryCommand = new AsyncRelayCommand(ClearHistoryAsync);
+            // 调试输出：验证初始化结果
+            System.Diagnostics.Debug.WriteLine($"[Debug] Initialized: {CommandPresets.Count} presets, {FilteredPresets.Count} filtered");
         }
 
         private void InitializePresets()
         {
-            // System Information
+            // 清空现有预设（如果有）
+            CommandPresets.Clear();
+
+            // System Information - 系统信息命令
             CommandPresets.Add(new CommandPreset
             {
                 Name = "System Info",
@@ -111,7 +123,7 @@ namespace LinuxCommandCenter.ViewModels
                 RequiresSudo = false
             });
 
-            // Process Management
+            // Process Management - 进程管理命令
             CommandPresets.Add(new CommandPreset
             {
                 Name = "Top Processes",
@@ -126,12 +138,12 @@ namespace LinuxCommandCenter.ViewModels
             {
                 Name = "Kill Process",
                 Command = "kill -9 {PID}",
-                Description = "Force kill a process",
+                Description = "Force kill a process (replace {PID})",
                 Category = "Processes",
                 RequiresSudo = false
             });
 
-            // Network
+            // Network - 网络命令
             CommandPresets.Add(new CommandPreset
             {
                 Name = "Network Info",
@@ -160,7 +172,7 @@ namespace LinuxCommandCenter.ViewModels
                 RequiresSudo = false
             });
 
-            // File Operations
+            // File Operations - 文件操作命令
             CommandPresets.Add(new CommandPreset
             {
                 Name = "List Files",
@@ -175,7 +187,7 @@ namespace LinuxCommandCenter.ViewModels
             {
                 Name = "Find Files",
                 Command = "find /path -name '*.txt' -type f",
-                Description = "Find files by pattern",
+                Description = "Find files by pattern (replace /path)",
                 Category = "Files",
                 RequiresSudo = false
             });
@@ -189,12 +201,12 @@ namespace LinuxCommandCenter.ViewModels
                 RequiresSudo = false
             });
 
-            // Services
+            // Services - 服务管理命令
             CommandPresets.Add(new CommandPreset
             {
                 Name = "Service Status",
                 Command = "systemctl status {service}",
-                Description = "Check service status",
+                Description = "Check service status (replace {service})",
                 Category = "Services",
                 RequiresSudo = true
             });
@@ -203,12 +215,12 @@ namespace LinuxCommandCenter.ViewModels
             {
                 Name = "Restart Service",
                 Command = "systemctl restart {service}",
-                Description = "Restart a system service",
+                Description = "Restart a system service (replace {service})",
                 Category = "Services",
                 RequiresSudo = true
             });
 
-            // Users
+            // Users - 用户管理命令
             CommandPresets.Add(new CommandPreset
             {
                 Name = "Logged Users",
@@ -226,45 +238,88 @@ namespace LinuxCommandCenter.ViewModels
                 Category = "Users",
                 RequiresSudo = false
             });
+
+            System.Diagnostics.Debug.WriteLine($"[Debug] Initialized {CommandPresets.Count} command presets");
         }
 
         private void FilterPresets()
         {
+            // 清空当前过滤列表
             FilteredPresets.Clear();
-            var query = string.IsNullOrWhiteSpace(SearchTerm)
-                ? CommandPresets
-                : CommandPresets.Where(p =>
-                    p.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.Description.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.Category.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase));
 
-            foreach (var preset in query.OrderBy(p => p.Category).ThenBy(p => p.Name))
+            // 决定要显示的集合
+            var sourceCollection = string.IsNullOrWhiteSpace(SearchTerm)
+                ? CommandPresets // 无搜索词：显示全部
+                : CommandPresets.Where(p =>
+                    (p.Name?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (p.Description?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (p.Category?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false));
+
+            // 按分类和名称排序后添加到过滤列表
+            foreach (var preset in sourceCollection
+                .OrderBy(p => p.Category)
+                .ThenBy(p => p.Name))
             {
                 FilteredPresets.Add(preset);
             }
+
+            System.Diagnostics.Debug.WriteLine($"[Debug] Filtered: SearchTerm='{SearchTerm}', Displaying {FilteredPresets.Count} of {CommandPresets.Count} presets");
         }
 
         private async Task ExecuteCustomCommandAsync()
         {
             if (string.IsNullOrWhiteSpace(CustomCommand))
+            {
+                System.Diagnostics.Debug.WriteLine("[Debug] Custom command is empty, skipping execution");
                 return;
+            }
+
+            System.Diagnostics.Debug.WriteLine($"[Debug] Executing custom command: {CustomCommand} (sudo: {UseSudo})");
 
             var result = await _shellService.ExecuteCommandAsync(CustomCommand, UseSudo);
             LastResult = result;
+
+            // 添加到历史记录（最新在最前面）
             CommandHistory.Insert(0, result);
 
+            // 限制历史记录数量
             if (CommandHistory.Count > 50)
                 CommandHistory.RemoveAt(CommandHistory.Count - 1);
+
+            System.Diagnostics.Debug.WriteLine($"[Debug] Command executed. Success: {result.IsSuccess}, Output length: {result.Output.Length}");
         }
 
-        private async Task ExecutePresetCommandAsync()
+        private async Task ExecutePresetCommandAsync(object? parameter)
         {
-            if (SelectedPreset == null)
-                return;
+            System.Diagnostics.Debug.WriteLine($"[Debug] ExecutePresetCommandAsync called with parameter: {parameter?.GetType().Name}");
 
-            var command = SelectedPreset.Command;
-            CustomCommand = command;
-            UseSudo = SelectedPreset.RequiresSudo;
+            CommandPreset? presetToExecute = null;
+
+            // 1. 优先使用参数传递的预设
+            if (parameter is CommandPreset presetFromParam)
+            {
+                presetToExecute = presetFromParam;
+                SelectedPreset = presetFromParam; // 同时更新选中状态
+                System.Diagnostics.Debug.WriteLine($"[Debug] Using preset from parameter: {presetFromParam.Name}");
+            }
+            // 2. 如果没有参数但当前有选中的预设，使用它
+            else if (SelectedPreset != null)
+            {
+                presetToExecute = SelectedPreset;
+                System.Diagnostics.Debug.WriteLine($"[Debug] Using currently selected preset: {SelectedPreset.Name}");
+            }
+            // 3. 两者都没有，无法执行
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("[Debug] No preset available to execute");
+                return;
+            }
+
+            // 执行命令
+            CustomCommand = presetToExecute.Command;
+            UseSudo = presetToExecute.RequiresSudo;
+
+            System.Diagnostics.Debug.WriteLine($"[Debug] Will execute preset: {presetToExecute.Name}, Command: {presetToExecute.Command}");
 
             await ExecuteCustomCommandAsync();
         }
@@ -272,6 +327,7 @@ namespace LinuxCommandCenter.ViewModels
         private Task ClearHistoryAsync()
         {
             CommandHistory.Clear();
+            System.Diagnostics.Debug.WriteLine("[Debug] Command history cleared");
             return Task.CompletedTask;
         }
     }

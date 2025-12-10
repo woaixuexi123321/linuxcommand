@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "0uzhqbK6fKg=",
+  "dgSpecHash": "0z5fYWsIBeY=",
   "success": true,
   "projectFilePath": "C:\\Development5\\Git\\gitlocal\\gitlocal3\\LinuxCommandCenter\\LinuxCommandCenter\\LinuxCommandCenter.csproj",
   "expectedPackageFiles": [
@@ -30,7 +30,6 @@
     "C:\\Users\\yanzhang\\.nuget\\packages\\material.icons\\2.1.0\\material.icons.2.1.0.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\material.icons.avalonia\\2.1.0\\material.icons.avalonia.2.1.0.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\microcom.runtime\\0.11.0\\microcom.runtime.0.11.0.nupkg.sha512",
-    "C:\\Users\\yanzhang\\.nuget\\packages\\microsoft.net.illink.tasks\\8.0.22\\microsoft.net.illink.tasks.8.0.22.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\panandzoom\\11.3.6\\panandzoom.11.3.6.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\skiasharp\\2.88.9\\skiasharp.2.88.9.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\skiasharp.nativeassets.linux\\2.88.9\\skiasharp.nativeassets.linux.2.88.9.nupkg.sha512",
@@ -38,10 +37,7 @@
     "C:\\Users\\yanzhang\\.nuget\\packages\\skiasharp.nativeassets.webassembly\\2.88.9\\skiasharp.nativeassets.webassembly.2.88.9.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\skiasharp.nativeassets.win32\\2.88.9\\skiasharp.nativeassets.win32.2.88.9.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\system.io.pipelines\\8.0.0\\system.io.pipelines.8.0.0.nupkg.sha512",
-    "C:\\Users\\yanzhang\\.nuget\\packages\\tmds.dbus.protocol\\0.21.2\\tmds.dbus.protocol.0.21.2.nupkg.sha512",
-    "C:\\Users\\yanzhang\\.nuget\\packages\\microsoft.netcore.app.runtime.linux-x64\\8.0.22\\microsoft.netcore.app.runtime.linux-x64.8.0.22.nupkg.sha512",
-    "C:\\Users\\yanzhang\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.linux-x64\\8.0.22\\microsoft.aspnetcore.app.runtime.linux-x64.8.0.22.nupkg.sha512",
-    "C:\\Users\\yanzhang\\.nuget\\packages\\microsoft.netcore.app.host.linux-x64\\8.0.22\\microsoft.netcore.app.host.linux-x64.8.0.22.nupkg.sha512"
+    "C:\\Users\\yanzhang\\.nuget\\packages\\tmds.dbus.protocol\\0.21.2\\tmds.dbus.protocol.0.21.2.nupkg.sha512"
   ],
   "logs": []
 }
