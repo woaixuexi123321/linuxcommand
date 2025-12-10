@@ -1,111 +1,239 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:LinuxCommandCenter.ViewModels"
-        mc:Ignorable="d"
+        xmlns:views="clr-namespace:LinuxCommandCenter.Views"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
         x:Class="LinuxCommandCenter.Views.MainWindow"
-        x:DataType="vm:MainWindowViewModel"
-        Width="1100"
-        Height="700"
-        MinWidth="900"
-        MinHeight="600"
         Title="Linux Command Center"
-        Background="Transparent">
-
-  <Window.Styles>
-    <!-- Navigation item appearance -->
-    <Style Selector="ListBox#NavigationListBox > ListBoxItem:selected">
-      <Setter Property="Background" Value="#111827"/>
-      <Setter Property="Foreground" Value="White"/>
-    </Style>
-
-    <Style Selector="ListBox#NavigationListBox > ListBoxItem">
-      <Setter Property="Padding" Value="10,8"/>
-      <Setter Property="Margin" Value="0,4"/>
-      <Setter Property="BorderThickness" Value="0"/>
-    </Style>
-  </Window.Styles>
-
-  <Grid>
-    <Grid.Background>
-      <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#020617" Offset="0"/>
-        <GradientStop Color="#0F172A" Offset="0.5"/>
-        <GradientStop Color="#111827" Offset="1"/>
-      </LinearGradientBrush>
-    </Grid.Background>
-
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="260"/>
-      <ColumnDefinition Width="*"/>
-    </Grid.ColumnDefinitions>
-
-    <!-- Navigation panel -->
-    <Border Grid.Column="0"
-            Margin="20"
-            CornerRadius="18"
-            Background="#02061780">
-      <Grid RowDefinitions="Auto,*,Auto"
-            Margin="20">
-
-        <!-- Logo / title -->
-        <StackPanel Orientation="Vertical" Spacing="4">
-          <TextBlock Text="Linux Command Center"
-                     FontSize="20"
-                     FontWeight="SemiBold"
-                     Foreground="White"/>
-          <TextBlock Text="Friendly wrapper for powerful commands"
-                     FontSize="12"
-                     Foreground="#9CA3AF"/>
-        </StackPanel>
-
-        <!-- Navigation items -->
-        <ListBox Grid.Row="1"
-                 x:Name="NavigationListBox"
-                 Margin="0,24,0,24"
-                 Background="Transparent"
-                 BorderThickness="0"
-                 ItemsSource="{Binding NavigationItems}"
-                 SelectedItem="{Binding SelectedNavigationItem}">
-          <ListBox.ItemTemplate>
-            <DataTemplate x:DataType="vm:NavigationItemViewModel">
-              <StackPanel Orientation="Vertical">
-                <TextBlock Text="{Binding Title}"
-                           FontWeight="SemiBold"
-                           FontSize="14"/>
-                <TextBlock Text="{Binding Subtitle}"
-                           FontSize="11"
-                           Foreground="#9CA3AF"
-                           TextWrapping="Wrap"/>
-              </StackPanel>
-            </DataTemplate>
-          </ListBox.ItemTemplate>
-        </ListBox>
-
-        <!-- Footer -->
-        <StackPanel Grid.Row="2"
-                    Orientation="Vertical"
-                    Spacing="4">
-          <Separator Margin="0,0,0,8"/>
-          <TextBlock Text="Safe by design"
-                     Foreground="#6B7280"
-                     FontSize="11"/>
-          <TextBlock Text="{Binding AppVersion}"
-                     Foreground="#9CA3AF"
-                     FontSize="11"/>
-        </StackPanel>
-      </Grid>
-    </Border>
-
-    <!-- Content area -->
-    <Border Grid.Column="1"
-            Margin="0,20,20,20"
-            CornerRadius="26"
-            Background="#F9FAFB">
-      <Grid Margin="24">
-        <ContentControl Content="{Binding CurrentViewModel}"/>
-      </Grid>
-    </Border>
-  </Grid>
+        WindowState="Maximized">
+    
+    <Window.Styles>
+        <Style Selector="Window">
+            <Setter Property="Background" Value="#0F172A"/>
+            <Setter Property="Foreground" Value="#E2E8F0"/>
+            <Setter Property="FontFamily" Value="Segoe UI, Inter, sans-serif"/>
+        </Style>
+        
+        <Style Selector="Border#MainBorder">
+            <Setter Property="CornerRadius" Value="10"/>
+        </Style>
+        
+        <Style Selector="Button">
+            <Setter Property="Background" Value="#1E293B"/>
+            <Setter Property="Foreground" Value="#E2E8F0"/>
+            <Setter Property="BorderBrush" Value="#334155"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12 8"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        
+        <Style Selector="Button:pointerover">
+            <Setter Property="Background" Value="#334155"/>
+            <Setter Property="BorderBrush" Value="#475569"/>
+        </Style>
+        
+        <Style Selector="Button:focus">
+            <Setter Property="BorderBrush" Value="#60A5FA"/>
+        </Style>
+        
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#3B82F6"/>
+            <Setter Property="BorderBrush" Value="#3B82F6"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        
+        <Style Selector="Button.primary:pointerover">
+            <Setter Property="Background" Value="#2563EB"/>
+        </Style>
+        
+        <Style Selector="Button.danger">
+            <Setter Property="Background" Value="#EF4444"/>
+            <Setter Property="BorderBrush" Value="#EF4444"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        
+        <Style Selector="Button.danger:pointerover">
+            <Setter Property="Background" Value="#DC2626"/>
+        </Style>
+        
+        <Style Selector="TextBlock.title">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#F8FAFC"/>
+        </Style>
+        
+        <Style Selector="TextBlock.subtitle">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#94A3B8"/>
+        </Style>
+        
+        <Style Selector="TextBox, ComboBox">
+            <Setter Property="Background" Value="#1E293B"/>
+            <Setter Property="Foreground" Value="#E2E8F0"/>
+            <Setter Property="BorderBrush" Value="#334155"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="8"/>
+        </Style>
+        
+        <Style Selector="TextBox:focus, ComboBox:focus">
+            <Setter Property="BorderBrush" Value="#60A5FA"/>
+        </Style>
+        
+        <Style Selector="ListBox">
+            <Setter Property="Background" Value="#1E293B"/>
+            <Setter Property="BorderBrush" Value="#334155"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+        
+        <Style Selector="ListBoxItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="12"/>
+        </Style>
+        
+        <Style Selector="ListBoxItem:selected">
+            <Setter Property="Background" Value="#334155"/>
+        </Style>
+        
+        <Style Selector="ListBoxItem:pointerover">
+            <Setter Property="Background" Value="#2D3748"/>
+        </Style>
+        
+        <Style Selector="CheckBox">
+            <Setter Property="Foreground" Value="#E2E8F0"/>
+        </Style>
+        
+        <Style Selector="Border.nav-item">
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Margin" Value="0 4"/>
+        </Style>
+        
+        <Style Selector="Border.nav-item.selected">
+            <Setter Property="Background" Value="#1E3A8A"/>
+        </Style>
+        
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="#1E293B"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Margin" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+    </Window.Styles>
+    
+    <DockPanel>
+        <!-- Status Bar -->
+        <Border DockPanel.Dock="Bottom" Height="30" Background="#1E293B" BorderBrush="#334155" BorderThickness="0,1,0,0">
+            <Grid Margin="10,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding StatusMessage}" Foreground="#94A3B8"/>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                    <Border CornerRadius="4" Padding="6,2" Background="{Binding ConnectionStatus, Converter={StaticResource ConnectionStatusConverter}}">
+                        <TextBlock Text="{Binding ConnectionStatus}" Foreground="White" FontWeight="SemiBold"/>
+                    </Border>
+                    
+                    <Button Command="{Binding TestConnectionCommand}" Padding="8,4">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <PathIcon Data="M12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6 2.69 6 6-2.69-6-6-6zm-1 9l-3-3 1.41-1.41L11 12.17l4.59-4.58L17 9l-6 6z" 
+                                    Width="16" Height="16"/>
+                            <TextBlock Text="Test"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Main Content -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Navigation Sidebar -->
+            <Border Grid.Column="0" Background="#0F172A" BorderBrush="#334155" BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Logo -->
+                    <Border Grid.Row="0" Padding="20" BorderBrush="#334155" BorderThickness="0,0,0,1">
+                        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                            <PathIcon Data="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" Width="28" Height="28"/>
+                            <StackPanel>
+                                <TextBlock Text="Command Center" FontSize="18" FontWeight="Bold" Foreground="#F8FAFC"/>
+                                <TextBlock Text="Linux Administration" FontSize="11" Foreground="#94A3B8"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Navigation Items -->
+                    <ScrollViewer Grid.Row="1" Margin="10">
+                        <ItemsControl ItemsSource="{Binding NavigationItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Classes="nav-item">
+                                        <Button Background="Transparent" BorderThickness="0" Command="{Binding OnSelectedCommand}"
+                                                HorizontalContentAlignment="Stretch" Padding="12,16">
+                                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                                <PathIcon Data="{Binding Icon}" Width="20" Height="20"/>
+                                                <TextBlock Text="{Binding Name}" 
+                                                          Foreground="{Binding IsSelected, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='#F8FAFC:#94A3B8'}"
+                                                          FontWeight="{Binding IsSelected, Converter={StaticResource BoolToStringConverter}, ConverterParameter='SemiBold:Normal'}"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    
+                    <!-- System Info -->
+                    <Border Grid.Row="2" Padding="16" BorderBrush="#334155" BorderThickness="0,1,0,0">
+                        <StackPanel Spacing="8">
+                            <Button Command="{Binding RefreshSystemInfoCommand}" Classes="primary" HorizontalAlignment="Stretch">
+                                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                    <PathIcon Data="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" 
+                                            Width="16" Height="16"/>
+                                    <TextBlock Text="Refresh System"/>
+                                </StackPanel>
+                            </Button>
+                            
+                            <TextBlock Text="v1.0.0" HorizontalAlignment="Center" FontSize="10" Foreground="#64748B"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+            
+            <!-- Content Area -->
+            <Border Grid.Column="1" Padding="20" Background="#0F172A">
+                <ContentControl Content="{Binding CurrentViewModel}">
+                    <ContentControl.ContentTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <views:QuickCommandsView DataContext="{Binding}" 
+                                        IsVisible="{Binding $self.DataContext, Converter={StaticResource IsTypeConverter}, ConverterParameter='LinuxCommandCenter.ViewModels.QuickCommandsViewModel'}"/>
+                                <views:FileOperationsView DataContext="{Binding}" 
+                                        IsVisible="{Binding $self.DataContext, Converter={StaticResource IsTypeConverter}, ConverterParameter='LinuxCommandCenter.ViewModels.FileOperationsViewModel'}"/>
+                                <views:SystemToolsView DataContext="{Binding}" 
+                                        IsVisible="{Binding $self.DataContext, Converter={StaticResource IsTypeConverter}, ConverterParameter='LinuxCommandCenter.ViewModels.SystemToolsViewModel'}"/>
+                                <views:LogViewerView DataContext="{Binding}" 
+                                        IsVisible="{Binding $self.DataContext, Converter={StaticResource IsTypeConverter}, ConverterParameter='LinuxCommandCenter.ViewModels.LogViewerViewModel'}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ContentControl.ContentTemplate>
+                </ContentControl>
+            </Border>
+        </Grid>
+    </DockPanel>
 </Window>

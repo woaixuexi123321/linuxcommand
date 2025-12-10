@@ -1,123 +1,194 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:m="clr-namespace:LinuxCommandCenter.Models"
-             xmlns:vm="clr-namespace:LinuxCommandCenter.ViewModels"
-             mc:Ignorable="d"
-             d:DesignWidth="800"
-             d:DesignHeight="450"
-             x:Class="LinuxCommandCenter.Views.LogViewerView"
-             x:DataType="vm:LogViewerViewModel">
-
-  <Grid RowDefinitions="Auto,*">
-    <!-- Header -->
-    <StackPanel Orientation="Vertical" Spacing="4">
-      <TextBlock Text="Command log"
-                 FontSize="22"
-                 FontWeight="SemiBold"
-                 Foreground="#111827"/>
-      <TextBlock Text="Browse and search all commands executed from this app."
-                 FontSize="13"
-                 Foreground="#6B7280"/>
-    </StackPanel>
-
-    <!-- Content -->
-    <Grid Grid.Row="1"
-          Margin="0,16,0,0"
-          ColumnDefinitions="2*,3*"
-          ColumnSpacing="16">
-
-      <!-- List -->
-      <Border Background="#F3F4F6"
-              CornerRadius="18"
-              Padding="12">
-        <Grid RowDefinitions="Auto,*,Auto"
-              RowSpacing="8">
-          <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                   Watermark="Search command or output..."
-                   Background="White"
-                   Padding="6"/>
-          <ListBox Grid.Row="1"
-                   Margin="0,4,0,0"
-                   ItemsSource="{Binding FilteredResults}"
-                   SelectedItem="{Binding SelectedResult}"
-                   BorderThickness="0"
-                   Background="Transparent">
-            <ListBox.ItemTemplate>
-              <DataTemplate x:DataType="m:CommandResult">
-                <Border Padding="8"
-                        Margin="0,2"
-                        CornerRadius="8"
-                        Background="White">
-                  <Grid RowDefinitions="Auto,Auto"
-                        RowSpacing="2">
-                    <TextBlock Text="{Binding CommandText}"
-                               FontWeight="SemiBold"
-                               FontSize="12"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Text="{Binding Summary}"
-                               FontSize="11"
-                               Foreground="#6B7280"/>
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-
-          <Button Grid.Row="2"
-                  Content="Clear log"
-                  HorizontalAlignment="Right"
-                  Command="{Binding ClearCommand}"/>
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="LinuxCommandCenter.Views.LogViewerView">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Classes="card" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="Log Viewer" Classes="title" Margin="0,0,0,8"/>
+                <TextBlock Text="View and analyze system logs with filtering and search capabilities." 
+                          Classes="subtitle" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+        
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Left Panel - Controls -->
+            <Border Grid.Column="0" Margin="0,0,16,0" Classes="card">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Log Selection -->
+                    <StackPanel Grid.Row="0" Spacing="12" Margin="0,0,0,24">
+                        <TextBlock Text="Select Log File" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                        
+                        <ComboBox ItemsSource="{Binding AvailableLogs}" SelectedValue="{Binding SelectedLogFile, Mode=TwoWay}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" Foreground="#F8FAFC"/>
+                                        <TextBlock Text="{Binding Path}" Foreground="#94A3B8" FontSize="10"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        
+                        <TextBox Text="{Binding LogFile, Mode=TwoWay}" Watermark="Or enter custom path"/>
+                    </StackPanel>
+                    
+                    <!-- Line Count -->
+                    <StackPanel Grid.Row="1" Spacing="12" Margin="0,0,0,24">
+                        <TextBlock Text="Display Options" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <Slider Grid.Column="0" Minimum="10" Maximum="1000" Value="{Binding LineCount}" 
+                                   TickFrequency="10" IsSnapToTickEnabled="True" Margin="0,0,8,0"/>
+                            <TextBlock Grid.Column="1" Text="{Binding LineCount}" MinWidth="30" 
+                                      Foreground="#94A3B8" VerticalAlignment="Center"/>
+                        </Grid>
+                        
+                        <CheckBox Content="Follow log (tail -f)" IsChecked="{Binding FollowLog}" Foreground="#94A3B8"/>
+                    </StackPanel>
+                    
+                    <!-- Filter Controls -->
+                    <StackPanel Grid.Row="2" Spacing="12" Margin="0,0,0,24">
+                        <TextBlock Text="Filters" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                        
+                        <TextBox Text="{Binding FilterText, Mode=TwoWay}" Watermark="Filter text..."/>
+                        
+                        <CheckBox Content="Show errors only" IsChecked="{Binding ShowErrorsOnly}" Foreground="#94A3B8"/>
+                        <CheckBox Content="Show warnings only" IsChecked="{Binding ShowWarningsOnly}" Foreground="#94A3B8"/>
+                        
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Text="From Date" Foreground="#94A3B8" FontSize="12" Margin="0,0,0,4"/>
+                            <DatePicker Grid.Row="1" SelectedDate="{Binding FromDate}"/>
+                        </Grid>
+                        
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Text="To Date" Foreground="#94A3B8" FontSize="12" Margin="0,0,0,4"/>
+                            <DatePicker Grid.Row="1" SelectedDate="{Binding ToDate}"/>
+                        </Grid>
+                    </StackPanel>
+                    
+                    <!-- Action Buttons -->
+                    <StackPanel Grid.Row="3" Spacing="8" VerticalAlignment="Bottom">
+                        <Button Command="{Binding RefreshLogsCommand}" Classes="primary" HorizontalAlignment="Stretch">
+                            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                <PathIcon Data="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" 
+                                        Width="16" Height="16"/>
+                                <TextBlock Text="Refresh Logs"/>
+                            </StackPanel>
+                        </Button>
+                        
+                        <Button Command="{Binding SearchLogsCommand}" HorizontalAlignment="Stretch">
+                            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                <PathIcon Data="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" 
+                                        Width="16" Height="16"/>
+                                <TextBlock Text="Search"/>
+                            </StackPanel>
+                        </Button>
+                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <Button Grid.Column="0" Command="{Binding ClearLogCommand}" Classes="danger" Margin="0,0,4,0">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <PathIcon Data="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" 
+                                            Width="16" Height="16"/>
+                                    <TextBlock Text="Clear"/>
+                                </StackPanel>
+                            </Button>
+                            
+                            <Button Grid.Column="1" Command="{Binding ExportLogCommand}" Margin="4,0,0,0">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <PathIcon Data="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" Width="16" Height="16"/>
+                                    <TextBlock Text="Export"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            
+            <!-- Right Panel - Log Display -->
+            <Border Grid.Column="1" Classes="card">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Statistics -->
+                    <WrapPanel Grid.Row="0" Margin="0,0,0,16">
+                        <Border CornerRadius="6" Background="#334155" Padding="8,4" Margin="0,0,12,0">
+                            <TextBlock Text="{Binding FilteredEntries.Count, StringFormat='Entries: {0}'}" Foreground="#94A3B8"/>
+                        </Border>
+                        
+                        <Border CornerRadius="6" Background="#334155" Padding="8,4">
+                            <TextBlock Text="{Binding LogFile}" Foreground="#94A3B8" TextTrimming="CharacterEllipsis" MaxWidth="300"/>
+                        </Border>
+                    </WrapPanel>
+                    
+                    <!-- Log Content -->
+                    <ScrollViewer Grid.Row="1">
+                        <ItemsControl ItemsSource="{Binding FilteredEntries}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,0,0,2" Padding="8,4">
+                                        <TextBlock Text="{Binding}" FontFamily="Consolas, Monaco, 'Courier New', monospace" 
+                                                  FontSize="12" Foreground="{Binding ., Converter={StaticResource StringContainsConverter}, ConverterParameter='error:#EF4444:#94A3B8'}">
+                                            <TextBlock.Styles>
+                                                <Style Selector="TextBlock">
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                </Style>
+                                                <Style Selector="TextBlock:pointerover">
+                                                    <Setter Property="Background" Value="#2D3748"/>
+                                                </Style>
+                                            </TextBlock.Styles>
+                                        </TextBlock>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
         </Grid>
-      </Border>
-
-      <!-- Details -->
-      <Border Grid.Column="1"
-              Background="White"
-              CornerRadius="18"
-              Padding="16">
-        <Grid RowDefinitions="Auto,Auto,*,Auto"
-              RowSpacing="8">
-          <TextBlock Text="{Binding SelectedResult.CommandText}"
-                     FontSize="14"
-                     FontWeight="SemiBold"
-                     Foreground="#111827"
-                     TextWrapping="Wrap"
-                     TextTrimming="CharacterEllipsis"/>
-
-          <TextBlock Grid.Row="1"
-                     Text="{Binding SelectedResult.Summary}"
-                     FontSize="11"
-                     Foreground="#6B7280"/>
-
-          <TabControl Grid.Row="2">
-            <TabItem Header="Standard output">
-              <ScrollViewer Margin="4">
-                <TextBlock Text="{Binding SelectedResult.StdOutput}"
-                           FontFamily="Consolas, Menlo, monospace"
-                           FontSize="12"
-                           TextWrapping="Wrap"/>
-              </ScrollViewer>
-            </TabItem>
-            <TabItem Header="Error output">
-              <ScrollViewer Margin="4">
-                <TextBlock Text="{Binding SelectedResult.StdError}"
-                           FontFamily="Consolas, Menlo, monospace"
-                           FontSize="12"
-                           Foreground="#B91C1C"
-                           TextWrapping="Wrap"/>
-              </ScrollViewer>
-            </TabItem>
-          </TabControl>
-
-          <TextBlock Grid.Row="3"
-                     Text="Only commands executed through this application are shown here."
-                     FontSize="11"
-                     Foreground="#9CA3AF"
-                     TextWrapping="Wrap"/>
-        </Grid>
-      </Border>
     </Grid>
-  </Grid>
 </UserControl>

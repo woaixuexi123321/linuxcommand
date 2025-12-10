@@ -1,0 +1,4 @@
+C:\Development5\Git\gitlocal\gitlocal3\LinuxCommandCenter\LinuxCommandCenter\bin\Release\net8.0\linux-x64\publish\LinuxCommandCenter.pdb
+C:\Development5\Git\gitlocal\gitlocal3\LinuxCommandCenter\LinuxCommandCenter\bin\Release\net8.0\linux-x64\publish\libHarfBuzzSharp.so
+C:\Development5\Git\gitlocal\gitlocal3\LinuxCommandCenter\LinuxCommandCenter\bin\Release\net8.0\linux-x64\publish\libSkiaSharp.so
+C:\Development5\Git\gitlocal\gitlocal3\LinuxCommandCenter\LinuxCommandCenter\bin\Release\net8.0\linux-x64\publish\LinuxCommandCenter

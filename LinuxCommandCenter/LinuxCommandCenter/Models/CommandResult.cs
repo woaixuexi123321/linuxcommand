@@ -1,20 +1,15 @@
 ﻿using System;
 
-namespace LinuxCommandCenter.Models;
-
-public class CommandResult
+namespace LinuxCommandCenter.Models
 {
-    public string CommandText { get; set; } = string.Empty;
-    public string WorkingDirectory { get; set; } = string.Empty;
-    public string StdOutput { get; set; } = string.Empty;
-    public string StdError { get; set; } = string.Empty;
-    public int ExitCode { get; set; }
-    public DateTimeOffset StartTime { get; set; }
-    public DateTimeOffset EndTime { get; set; }
-
-    public TimeSpan Duration => EndTime - StartTime;
-    public bool IsSuccess => ExitCode == 0;
-
-    public string Summary =>
-        $"{StartTime:HH:mm:ss} • Exit {ExitCode} • {(IsSuccess ? "Success" : "Error")}";
+    public class CommandResult
+    {
+        public string Command { get; set; } = string.Empty;
+        public string Output { get; set; } = string.Empty;
+        public string Error { get; set; } = string.Empty;
+        public int ExitCode { get; set; }
+        public DateTime Timestamp { get; set; }
+        public bool IsSuccess => ExitCode == 0;
+        public TimeSpan ExecutionTime { get; set; }
+    }
 }

@@ -1,9 +1,16 @@
-﻿namespace LinuxCommandCenter.Models;
-
-public enum FileOperationType
+﻿namespace LinuxCommandCenter.Models
 {
-    Copy,
-    Move,
-    Delete,
-    Compress
+    public enum FileOperationType
+    {
+        Copy,
+        Move,
+        Delete,
+        Rename,
+        CreateDirectory,
+        CreateFile,
+        ChangePermissions,
+        ChangeOwner,
+        Compress,
+        Extract
+    }
 }

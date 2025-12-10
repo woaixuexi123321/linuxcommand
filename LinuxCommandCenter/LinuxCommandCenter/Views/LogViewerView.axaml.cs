@@ -1,11 +1,19 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 
-namespace LinuxCommandCenter.Views;
-
-public partial class LogViewerView : UserControl
+namespace LinuxCommandCenter.Views
 {
-    public LogViewerView()
+    public partial class LogViewerView : UserControl
     {
-        InitializeComponent();
+        public LogViewerView()
+        {
+            InitializeComponent();
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
     }
 }

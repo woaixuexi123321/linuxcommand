@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "MQTBwtozhdg=",
+  "dgSpecHash": "0z5fYWsIBeY=",
   "success": true,
   "projectFilePath": "C:\\Development5\\Git\\gitlocal\\gitlocal3\\LinuxCommandCenter\\LinuxCommandCenter\\LinuxCommandCenter.csproj",
   "expectedPackageFiles": [
@@ -8,6 +8,7 @@
     "C:\\Users\\yanzhang\\.nuget\\packages\\avalonia.angle.windows.natives\\2.1.25547.20250602\\avalonia.angle.windows.natives.2.1.25547.20250602.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\avalonia.buildservices\\11.3.2\\avalonia.buildservices.11.3.2.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\avalonia.controls.colorpicker\\11.3.9\\avalonia.controls.colorpicker.11.3.9.nupkg.sha512",
+    "C:\\Users\\yanzhang\\.nuget\\packages\\avalonia.controls.datagrid\\11.3.9\\avalonia.controls.datagrid.11.3.9.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\avalonia.desktop\\11.3.9\\avalonia.desktop.11.3.9.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\avalonia.diagnostics\\11.3.9\\avalonia.diagnostics.11.3.9.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\avalonia.fonts.inter\\11.3.9\\avalonia.fonts.inter.11.3.9.nupkg.sha512",
@@ -25,7 +26,11 @@
     "C:\\Users\\yanzhang\\.nuget\\packages\\harfbuzzsharp.nativeassets.macos\\8.3.1.1\\harfbuzzsharp.nativeassets.macos.8.3.1.1.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\harfbuzzsharp.nativeassets.webassembly\\8.3.1.1\\harfbuzzsharp.nativeassets.webassembly.8.3.1.1.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\harfbuzzsharp.nativeassets.win32\\8.3.1.1\\harfbuzzsharp.nativeassets.win32.8.3.1.1.nupkg.sha512",
+    "C:\\Users\\yanzhang\\.nuget\\packages\\material.avalonia\\3.3.0\\material.avalonia.3.3.0.nupkg.sha512",
+    "C:\\Users\\yanzhang\\.nuget\\packages\\material.icons\\2.1.0\\material.icons.2.1.0.nupkg.sha512",
+    "C:\\Users\\yanzhang\\.nuget\\packages\\material.icons.avalonia\\2.1.0\\material.icons.avalonia.2.1.0.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\microcom.runtime\\0.11.0\\microcom.runtime.0.11.0.nupkg.sha512",
+    "C:\\Users\\yanzhang\\.nuget\\packages\\panandzoom\\11.3.6\\panandzoom.11.3.6.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\skiasharp\\2.88.9\\skiasharp.2.88.9.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\skiasharp.nativeassets.linux\\2.88.9\\skiasharp.nativeassets.linux.2.88.9.nupkg.sha512",
     "C:\\Users\\yanzhang\\.nuget\\packages\\skiasharp.nativeassets.macos\\2.88.9\\skiasharp.nativeassets.macos.2.88.9.nupkg.sha512",

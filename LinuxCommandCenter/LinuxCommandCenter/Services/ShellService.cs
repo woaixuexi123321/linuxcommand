@@ -1,142 +1,100 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using LinuxCommandCenter.Models;
 
-namespace LinuxCommandCenter.Services;
-
-public class ShellService
+namespace LinuxCommandCenter.Services
 {
-    public event EventHandler<CommandResult>? CommandExecuted;
-
-    public async Task<CommandResult> RunCommandAsync(
-        string command,
-        string? workingDirectory = null,
-        CancellationToken cancellationToken = default)
+    public class ShellService
     {
-        if (string.IsNullOrWhiteSpace(command))
-            throw new ArgumentException("Command must not be empty.", nameof(command));
-
-        var (fileName, arguments) = BuildShellCommand(command);
-
-        var startInfo = new ProcessStartInfo
+        public async Task<CommandResult> ExecuteCommandAsync(string command, bool useSudo = false, string? workingDirectory = null)
         {
-            FileName = fileName,
-            Arguments = arguments,
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-            StandardOutputEncoding = Encoding.UTF8,
-            StandardErrorEncoding = Encoding.UTF8
-        };
-
-        if (!string.IsNullOrWhiteSpace(workingDirectory))
-        {
-            startInfo.WorkingDirectory = workingDirectory;
-        }
-
-        var result = new CommandResult
-        {
-            CommandText = command,
-            WorkingDirectory = startInfo.WorkingDirectory ?? string.Empty,
-            StartTime = DateTimeOffset.Now
-        };
-
-        using var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
-
-        var stdOutBuilder = new StringBuilder();
-        var stdErrBuilder = new StringBuilder();
-        var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        process.OutputDataReceived += (_, e) =>
-        {
-            if (e.Data != null)
+            var result = new CommandResult
             {
-                lock (stdOutBuilder)
+                Command = command,
+                Timestamp = DateTime.Now
+            };
+
+            try
+            {
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+                // 处理工作目录中的~符号
+                var actualWorkingDirectory = workingDirectory;
+                if (!string.IsNullOrEmpty(actualWorkingDirectory) && actualWorkingDirectory.Contains("~"))
                 {
-                    stdOutBuilder.AppendLine(e.Data);
+                    var homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    actualWorkingDirectory = actualWorkingDirectory.Replace("~", homePath);
                 }
-            }
-        };
 
-        process.ErrorDataReceived += (_, e) =>
-        {
-            if (e.Data != null)
-            {
-                lock (stdErrBuilder)
+                // 如果未指定工作目录，使用用户主目录
+                actualWorkingDirectory ??= Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+                var escapedArgs = command.Replace("\"", "\\\"");
+
+                using var process = new System.Diagnostics.Process
                 {
-                    stdErrBuilder.AppendLine(e.Data);
-                }
-            }
-        };
-
-        process.Exited += (_, _) =>
-        {
-            tcs.TrySetResult(true);
-        };
-
-        try
-        {
-            if (!process.Start())
-            {
-                throw new InvalidOperationException("Failed to start shell process.");
-            }
-
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-
-            using (cancellationToken.Register(() =>
-            {
-                try
-                {
-                    if (!process.HasExited)
+                    StartInfo = new System.Diagnostics.ProcessStartInfo
                     {
-                        process.Kill(entireProcessTree: true);
+                        FileName = useSudo ? "sudo" : "/bin/bash",
+                        Arguments = useSudo ? $"-S bash -c \"{escapedArgs}\"" : $"-c \"{escapedArgs}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        RedirectStandardInput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        WorkingDirectory = actualWorkingDirectory
                     }
-                }
-                catch
+                };
+
+                process.Start();
+
+                if (useSudo)
                 {
-                    // ignore
+                    // 注意：在实际应用中，需要安全地获取sudo密码
+                    // 这里假设sudo已配置为不需要密码或使用NOPASSWD
+                    await process.StandardInput.WriteLineAsync();
+                    await process.StandardInput.FlushAsync();
                 }
-            }))
+
+                var outputTask = process.StandardOutput.ReadToEndAsync();
+                var errorTask = process.StandardError.ReadToEndAsync();
+
+                await Task.WhenAll(outputTask, process.WaitForExitAsync());
+
+                stopwatch.Stop();
+
+                result.Output = await outputTask;
+                result.Error = await errorTask;
+                result.ExitCode = process.ExitCode;
+                result.ExecutionTime = stopwatch.Elapsed;
+            }
+            catch (Exception ex)
             {
-                await tcs.Task.ConfigureAwait(false);
+                result.Error = $"Error executing command: {ex.Message}";
+                result.ExitCode = -1;
             }
 
-            // Small delay to ensure all async output has been read
-            await Task.Delay(10, CancellationToken.None).ConfigureAwait(false);
-
-            result.ExitCode = process.ExitCode;
-            result.StdOutput = stdOutBuilder.ToString();
-            result.StdError = stdErrBuilder.ToString();
-            result.EndTime = DateTimeOffset.Now;
-
-            CommandExecuted?.Invoke(this, result);
-
             return result;
         }
-        catch (Exception ex)
+        public async Task<CommandResult> TestConnectionAsync()
         {
-            result.EndTime = DateTimeOffset.Now;
-            result.ExitCode = -1;
-            result.StdError = ex.ToString();
-            CommandExecuted?.Invoke(this, result);
-            return result;
-        }
-    }
-
-    private static (string FileName, string Arguments) BuildShellCommand(string command)
-    {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            return ("cmd.exe", "/C " + command);
+            return await ExecuteCommandAsync("echo 'Connection Test Successful' && whoami && hostname");
         }
 
-        // Linux / macOS: use bash
-        return ("/bin/bash", "-c \"" + command.Replace("\"", "\\\"") + "\"");
+        public async Task<CommandResult> GetSystemInfoAsync()
+        {
+            return await ExecuteCommandAsync("uname -a && lsb_release -a 2>/dev/null || cat /etc/os-release");
+        }
+
+        public async Task<CommandResult> GetDiskUsageAsync()
+        {
+            return await ExecuteCommandAsync("df -h");
+        }
+
+        public async Task<CommandResult> GetProcessListAsync()
+        {
+            return await ExecuteCommandAsync("ps aux --sort=-%cpu | head -20");
+        }
     }
 }
