@@ -54,11 +54,17 @@
               "target": "Package",
               "version": "[11.3.9, )"
             },
+            "Avalonia.Controls.DataGrid": {
+              "target": "Package",
+              "version": "[11.3.9, )"
+            },
             "Avalonia.Desktop": {
               "target": "Package",
               "version": "[11.3.9, )"
             },
             "Avalonia.Diagnostics": {
+              "include": "None",
+              "suppressParent": "All",
               "target": "Package",
               "version": "[11.3.9, )"
             },
@@ -73,6 +79,24 @@
             "CommunityToolkit.Mvvm": {
               "target": "Package",
               "version": "[8.2.1, )"
+            },
+            "Material.Avalonia": {
+              "target": "Package",
+              "version": "[3.3.0, )"
+            },
+            "Material.Icons.Avalonia": {
+              "target": "Package",
+              "version": "[2.1.0, )"
+            },
+            "Microsoft.NET.ILLink.Tasks": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.22, )",
+              "autoReferenced": true
+            },
+            "PanAndZoom": {
+              "target": "Package",
+              "version": "[11.3.6, )"
             }
           },
           "imports": [
@@ -86,12 +110,31 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Runtime.linux-x64",
+              "version": "[8.0.22, 8.0.22]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.linux-x64",
+              "version": "[8.0.22, 8.0.22]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Runtime.linux-x64",
+              "version": "[8.0.22, 8.0.22]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.308/PortableRuntimeIdentifierGraph.json"
+        }
+      },
+      "runtimes": {
+        "linux-x64": {
+          "#import": []
         }
       }
     }

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LinuxCommandCenter")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+20c48f5227ea819ab2a6103c99b55ddafeaf6b19")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f5ea8accd46d45c78c5ff2f0e93ebf0b4a5623ac")]
 [assembly: System.Reflection.AssemblyProductAttribute("LinuxCommandCenter")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LinuxCommandCenter")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

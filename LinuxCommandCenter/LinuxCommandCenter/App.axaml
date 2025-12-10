@@ -1,15 +1,23 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="LinuxCommandCenter.App"
-             xmlns:local="using:LinuxCommandCenter"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
-
-    <Application.DataTemplates>
-        <local:ViewLocator/>
-    </Application.DataTemplates>
+             xmlns:converters="clr-namespace:LinuxCommandCenter.Converters"
+             x:Class="LinuxCommandCenter.App">
   
-    <Application.Styles>
-        <FluentTheme />
-    </Application.Styles>
+  <Application.Styles>
+    <FluentTheme />
+  </Application.Styles>
+  
+  <Application.Resources>
+    <ResourceDictionary>
+      <converters:ConnectionStatusConverter x:Key="ConnectionStatusConverter"/>
+      <converters:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
+      <converters:BoolToStringConverter x:Key="BoolToStringConverter"/>
+      <converters:IsTypeConverter x:Key="IsTypeConverter"/>
+      <converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
+      <converters:StringContainsConverter x:Key="StringContainsConverter"/>
+      <converters:StringEqualsConverter x:Key="StringEqualsConverter"/>
+      <converters:MultiStringContainsConverter x:Key="MultiStringContainsConverter"/>
+      <converters:FileIconConverter x:Key="FileIconConverter"/>
+    </ResourceDictionary>
+  </Application.Resources>
 </Application>

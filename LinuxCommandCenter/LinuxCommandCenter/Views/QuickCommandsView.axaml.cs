@@ -1,11 +1,19 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 
-namespace LinuxCommandCenter.Views;
-
-public partial class QuickCommandsView : UserControl
+namespace LinuxCommandCenter.Views
 {
-    public QuickCommandsView()
+    public partial class QuickCommandsView : UserControl
     {
-        InitializeComponent();
+        public QuickCommandsView()
+        {
+            InitializeComponent();
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
     }
 }

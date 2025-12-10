@@ -9,11 +9,15 @@
       "LinuxCommandCenter/1.0.0": {
         "dependencies": {
           "Avalonia": "11.3.9",
+          "Avalonia.Controls.DataGrid": "11.3.9",
           "Avalonia.Desktop": "11.3.9",
           "Avalonia.Diagnostics": "11.3.9",
           "Avalonia.Fonts.Inter": "11.3.9",
           "Avalonia.Themes.Fluent": "11.3.9",
-          "CommunityToolkit.Mvvm": "8.2.1"
+          "CommunityToolkit.Mvvm": "8.2.1",
+          "Material.Avalonia": "3.3.0",
+          "Material.Icons.Avalonia": "2.1.0",
+          "PanAndZoom": "11.3.6"
         },
         "runtime": {
           "LinuxCommandCenter.dll": {}
@@ -99,6 +103,17 @@
         },
         "runtime": {
           "lib/net8.0/Avalonia.Controls.ColorPicker.dll": {
+            "assemblyVersion": "11.3.9.0",
+            "fileVersion": "11.3.9.0"
+          }
+        }
+      },
+      "Avalonia.Controls.DataGrid/11.3.9": {
+        "dependencies": {
+          "Avalonia": "11.3.9"
+        },
+        "runtime": {
+          "lib/net8.0/Avalonia.Controls.DataGrid.dll": {
             "assemblyVersion": "11.3.9.0",
             "fileVersion": "11.3.9.0"
           }
@@ -357,11 +372,65 @@
           }
         }
       },
+      "Material.Avalonia/3.3.0": {
+        "dependencies": {
+          "Avalonia": "11.3.9"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Material.Avalonia.dll": {
+            "assemblyVersion": "3.3.0.0",
+            "fileVersion": "3.3.0.0"
+          },
+          "lib/netstandard2.0/Material.Colors.dll": {
+            "assemblyVersion": "3.3.0.0",
+            "fileVersion": "3.3.0.0"
+          },
+          "lib/netstandard2.0/Material.Ripple.dll": {
+            "assemblyVersion": "3.3.0.0",
+            "fileVersion": "3.3.0.0"
+          },
+          "lib/netstandard2.0/Material.Styles.dll": {
+            "assemblyVersion": "3.3.0.0",
+            "fileVersion": "3.3.0.0"
+          }
+        }
+      },
+      "Material.Icons/2.1.0": {
+        "runtime": {
+          "lib/netstandard2.0/Material.Icons.dll": {
+            "assemblyVersion": "2.1.0.0",
+            "fileVersion": "2.1.0.0"
+          }
+        }
+      },
+      "Material.Icons.Avalonia/2.1.0": {
+        "dependencies": {
+          "Avalonia": "11.3.9",
+          "Material.Icons": "2.1.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Material.Icons.Avalonia.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "MicroCom.Runtime/0.11.0": {
         "runtime": {
           "lib/net5.0/MicroCom.Runtime.dll": {
             "assemblyVersion": "0.11.0.0",
             "fileVersion": "0.11.0.0"
+          }
+        }
+      },
+      "PanAndZoom/11.3.6": {
+        "dependencies": {
+          "Avalonia": "11.3.9"
+        },
+        "runtime": {
+          "lib/net8.0/PanAndZoom.dll": {
+            "assemblyVersion": "11.3.6.0",
+            "fileVersion": "11.3.6.0"
           }
         }
       },
@@ -488,6 +557,13 @@
       "path": "avalonia.controls.colorpicker/11.3.9",
       "hashPath": "avalonia.controls.colorpicker.11.3.9.nupkg.sha512"
     },
+    "Avalonia.Controls.DataGrid/11.3.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-+3UjzwngTW9s9QXhMemC3dAFB8Y/wM28g2WbE7C/lxUPson+XUN5d4ot5d7lW5RVD0toWyk5tORr1uo7a/lxPQ==",
+      "path": "avalonia.controls.datagrid/11.3.9",
+      "hashPath": "avalonia.controls.datagrid.11.3.9.nupkg.sha512"
+    },
     "Avalonia.Desktop/11.3.9": {
       "type": "package",
       "serviceable": true,
@@ -607,12 +683,40 @@
       "path": "harfbuzzsharp.nativeassets.win32/8.3.1.1",
       "hashPath": "harfbuzzsharp.nativeassets.win32.8.3.1.1.nupkg.sha512"
     },
+    "Material.Avalonia/3.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-81aA1SUm9b17PlnHM5Z+XQqV/EQ2XexWmvPhlaiJc2NjF7fhhRwoD16sk4aQ+1a2LjqDw2xbngxLURZI3D6bcw==",
+      "path": "material.avalonia/3.3.0",
+      "hashPath": "material.avalonia.3.3.0.nupkg.sha512"
+    },
+    "Material.Icons/2.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-oMMrh8mKnZwOKZJEI3hc4Y18+/FQDfXSMv21xbX4kq05gcvcD1M2zxrjgNQvygHhP4DTcFmDidqUJRmuPyV9Fg==",
+      "path": "material.icons/2.1.0",
+      "hashPath": "material.icons.2.1.0.nupkg.sha512"
+    },
+    "Material.Icons.Avalonia/2.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-IEuKf8mrByuxvjsM9LPWs+Ic0JPViDwZS7q1FzpHpu3QCEKOIriDiMNI6GaAtUA3uzz9OfAbd5vSjTi6SVbJrQ==",
+      "path": "material.icons.avalonia/2.1.0",
+      "hashPath": "material.icons.avalonia.2.1.0.nupkg.sha512"
+    },
     "MicroCom.Runtime/0.11.0": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-MEnrZ3UIiH40hjzMDsxrTyi8dtqB5ziv3iBeeU4bXsL/7NLSal9F1lZKpK+tfBRnUoDSdtcW3KufE4yhATOMCA==",
       "path": "microcom.runtime/0.11.0",
       "hashPath": "microcom.runtime.0.11.0.nupkg.sha512"
+    },
+    "PanAndZoom/11.3.6": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-6xsg4EcJgs1uYs1B2xyK/y4xwN4+jX32DPfPUSN2Sitozks8G5BqoPgw3C5ieBSif4i5KEZHuTZ82hmBhimYJA==",
+      "path": "panandzoom/11.3.6",
+      "hashPath": "panandzoom.11.3.6.nupkg.sha512"
     },
     "SkiaSharp/2.88.9": {
       "type": "package",

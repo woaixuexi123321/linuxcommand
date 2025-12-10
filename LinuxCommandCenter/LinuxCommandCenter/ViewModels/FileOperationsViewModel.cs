@@ -1,263 +1,206 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using LinuxCommandCenter.Commands;
 using LinuxCommandCenter.Models;
 using LinuxCommandCenter.Services;
 
-namespace LinuxCommandCenter.ViewModels;
-
-public class FileOperationsViewModel : ViewModelBase
+namespace LinuxCommandCenter.ViewModels
 {
-    private readonly ShellService _shellService;
-
-    private FileOperationType _selectedOperation;
-    private string _sourcePath = string.Empty;
-    private string _destinationPath = string.Empty;
-    private bool _includeSubdirectories = true;
-    private bool _overwriteExisting = true;
-    private bool _deleteConfirmation;
-    private string _commandPreview = string.Empty;
-    private string _output = string.Empty;
-    private string _error = string.Empty;
-    private string _status = "Ready";
-    private bool _isBusy;
-
-    public FileOperationsViewModel(ShellService shellService)
+    public class FileOperationsViewModel : ViewModelBase
     {
-        _shellService = shellService;
+        private readonly ShellService _shellService = new();
+        private string _currentDirectory = "~";
+        private string _selectedFile = string.Empty;
+        private string _destinationPath = string.Empty;
+        private string _filePermissions = "644";
+        private string _fileOwner = string.Empty;
+        private string _fileGroup = string.Empty;
+        private FileOperationType _selectedOperation = FileOperationType.Copy;
+        private bool _recursiveOperation;
 
-        AvailableOperations = new ObservableCollection<FileOperationType>(
-            Enum.GetValues<FileOperationType>());
+        public ObservableCollection<string> DirectoryContents { get; } = new();
+        public ObservableCollection<FileOperationType> OperationTypes { get; } = new();
 
-        SelectedOperation = FileOperationType.Copy;
+        public AsyncRelayCommand NavigateToHomeCommand { get; }
+        public AsyncRelayCommand NavigateUpCommand { get; }
+        public AsyncRelayCommand RefreshDirectoryCommand { get; }
+        public AsyncRelayCommand ExecuteFileOperationCommand { get; }
+        public AsyncRelayCommand CreateDirectoryCommand { get; }
+        public AsyncRelayCommand CreateFileCommand { get; }
+        public AsyncRelayCommand ChangePermissionsCommand { get; }
 
-        ExecuteOperationCommand = new AsyncRelayCommand(ExecuteOperationAsync, CanExecute);
-    }
-
-    public ObservableCollection<FileOperationType> AvailableOperations { get; }
-
-    public FileOperationType SelectedOperation
-    {
-        get => _selectedOperation;
-        set
+        public string CurrentDirectory
         {
-            if (SetProperty(ref _selectedOperation, value))
+            get => _currentDirectory;
+            set
             {
-                UpdateCommandPreview();
-                OnPropertyChanged(nameof(IsDeleteOperation));
+                SetField(ref _currentDirectory, value);
+                RefreshDirectoryAsync().ConfigureAwait(false);
             }
         }
-    }
 
-    public bool IsDeleteOperation => SelectedOperation == FileOperationType.Delete;
-
-    public string SourcePath
-    {
-        get => _sourcePath;
-        set
+        public string SelectedFile
         {
-            if (SetProperty(ref _sourcePath, value))
+            get => _selectedFile;
+            set => SetField(ref _selectedFile, value);
+        }
+
+        public string DestinationPath
+        {
+            get => _destinationPath;
+            set => SetField(ref _destinationPath, value);
+        }
+
+        public string FilePermissions
+        {
+            get => _filePermissions;
+            set => SetField(ref _filePermissions, value);
+        }
+
+        public string FileOwner
+        {
+            get => _fileOwner;
+            set => SetField(ref _fileOwner, value);
+        }
+
+        public string FileGroup
+        {
+            get => _fileGroup;
+            set => SetField(ref _fileGroup, value);
+        }
+
+        public FileOperationType SelectedOperation
+        {
+            get => _selectedOperation;
+            set => SetField(ref _selectedOperation, value);
+        }
+
+        public bool RecursiveOperation
+        {
+            get => _recursiveOperation;
+            set => SetField(ref _recursiveOperation, value);
+        }
+
+        public FileOperationsViewModel()
+        {
+            InitializeOperationTypes();
+
+            NavigateToHomeCommand = new AsyncRelayCommand(NavigateToHomeAsync);
+            NavigateUpCommand = new AsyncRelayCommand(NavigateUpAsync);
+            RefreshDirectoryCommand = new AsyncRelayCommand(RefreshDirectoryAsync);
+            ExecuteFileOperationCommand = new AsyncRelayCommand(ExecuteFileOperationAsync);
+            CreateDirectoryCommand = new AsyncRelayCommand(CreateDirectoryAsync);
+            CreateFileCommand = new AsyncRelayCommand(CreateFileAsync);
+            ChangePermissionsCommand = new AsyncRelayCommand(ChangePermissionsAsync);
+
+            RefreshDirectoryAsync().ConfigureAwait(false);
+        }
+
+        private void InitializeOperationTypes()
+        {
+            foreach (FileOperationType type in Enum.GetValues(typeof(FileOperationType)))
             {
-                UpdateCommandPreview();
+                OperationTypes.Add(type);
             }
         }
-    }
 
-    public string DestinationPath
-    {
-        get => _destinationPath;
-        set
+        private async Task NavigateToHomeAsync()
         {
-            if (SetProperty(ref _destinationPath, value))
+            CurrentDirectory = "~";
+        }
+
+        private async Task NavigateUpAsync()
+        {
+            if (CurrentDirectory != "/" && !string.IsNullOrWhiteSpace(CurrentDirectory))
             {
-                UpdateCommandPreview();
+                var dir = System.IO.Path.GetDirectoryName(CurrentDirectory);
+                if (!string.IsNullOrEmpty(dir))
+                {
+                    CurrentDirectory = dir;
+                }
             }
         }
-    }
 
-    public bool IncludeSubdirectories
-    {
-        get => _includeSubdirectories;
-        set
+        private async Task RefreshDirectoryAsync()
         {
-            if (SetProperty(ref _includeSubdirectories, value))
+            DirectoryContents.Clear();
+
+            var result = await _shellService.ExecuteCommandAsync($"ls -la \"{CurrentDirectory}\"");
+
+            if (result.IsSuccess)
             {
-                UpdateCommandPreview();
+                var lines = result.Output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var line in lines)
+                {
+                    if (!line.StartsWith("total"))
+                    {
+                        DirectoryContents.Add(line);
+                    }
+                }
             }
         }
-    }
 
-    public bool OverwriteExisting
-    {
-        get => _overwriteExisting;
-        set
+        private async Task ExecuteFileOperationAsync()
         {
-            if (SetProperty(ref _overwriteExisting, value))
+            if (string.IsNullOrWhiteSpace(SelectedFile))
+                return;
+
+            string command = SelectedOperation switch
             {
-                UpdateCommandPreview();
+                FileOperationType.Copy => $"cp {(RecursiveOperation ? "-r " : "")}\"{SelectedFile}\" \"{DestinationPath}\"",
+                FileOperationType.Move => $"mv \"{SelectedFile}\" \"{DestinationPath}\"",
+                FileOperationType.Delete => $"rm {(RecursiveOperation ? "-r " : "")}-f \"{SelectedFile}\"",
+                FileOperationType.Rename => $"mv \"{SelectedFile}\" \"{DestinationPath}\"",
+                FileOperationType.Compress => $"tar -czf \"{DestinationPath}.tar.gz\" \"{SelectedFile}\"",
+                FileOperationType.Extract => $"tar -xzf \"{SelectedFile}\" -C \"{DestinationPath}\"",
+                _ => string.Empty
+            };
+
+            if (!string.IsNullOrEmpty(command))
+            {
+                var result = await _shellService.ExecuteCommandAsync(command);
+                if (result.IsSuccess)
+                {
+                    await RefreshDirectoryAsync();
+                }
             }
         }
-    }
 
-    public bool DeleteConfirmation
-    {
-        get => _deleteConfirmation;
-        set
+        private async Task CreateDirectoryAsync()
         {
-            if (SetProperty(ref _deleteConfirmation, value))
+            if (!string.IsNullOrWhiteSpace(DestinationPath))
             {
-                ExecuteOperationCommand.RaiseCanExecuteChanged();
+                var result = await _shellService.ExecuteCommandAsync($"mkdir -p \"{DestinationPath}\"");
+                if (result.IsSuccess)
+                {
+                    await RefreshDirectoryAsync();
+                }
             }
         }
-    }
 
-    public string CommandPreview
-    {
-        get => _commandPreview;
-        private set => SetProperty(ref _commandPreview, value);
-    }
-
-    public string Output
-    {
-        get => _output;
-        set => SetProperty(ref _output, value);
-    }
-
-    public string Error
-    {
-        get => _error;
-        set => SetProperty(ref _error, value);
-    }
-
-    public string Status
-    {
-        get => _status;
-        set => SetProperty(ref _status, value);
-    }
-
-    public bool IsBusy
-    {
-        get => _isBusy;
-        set
+        private async Task CreateFileAsync()
         {
-            if (SetProperty(ref _isBusy, value))
+            if (!string.IsNullOrWhiteSpace(DestinationPath))
             {
-                ExecuteOperationCommand.RaiseCanExecuteChanged();
+                var result = await _shellService.ExecuteCommandAsync($"touch \"{DestinationPath}\"");
+                if (result.IsSuccess)
+                {
+                    await RefreshDirectoryAsync();
+                }
             }
         }
-    }
 
-    public AsyncRelayCommand ExecuteOperationCommand { get; }
-
-    private void UpdateCommandPreview()
-    {
-        CommandPreview = BuildCommand();
-    }
-
-    private string BuildCommand()
-    {
-        string Quote(string path) => string.IsNullOrWhiteSpace(path) ? string.Empty : $"\"{path}\"";
-
-        var source = Quote(SourcePath.Trim());
-        var destination = Quote(DestinationPath.Trim());
-
-        return SelectedOperation switch
+        private async Task ChangePermissionsAsync()
         {
-            FileOperationType.Copy => BuildCopyCommand(source, destination),
-            FileOperationType.Move => BuildMoveCommand(source, destination),
-            FileOperationType.Delete => BuildDeleteCommand(source),
-            FileOperationType.Compress => BuildCompressCommand(source, destination),
-            _ => string.Empty
-        };
-    }
-
-    private string BuildCopyCommand(string source, string destination)
-    {
-        if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(destination))
-            return string.Empty;
-
-        var flags = new List<string>();
-        if (IncludeSubdirectories)
-        {
-            flags.Add("-r");
+            if (!string.IsNullOrWhiteSpace(SelectedFile))
+            {
+                var result = await _shellService.ExecuteCommandAsync($"chmod {FilePermissions} \"{SelectedFile}\"");
+                if (result.IsSuccess)
+                {
+                    await RefreshDirectoryAsync();
+                }
+            }
         }
-
-        if (OverwriteExisting)
-        {
-            flags.Add("-f");
-        }
-
-        var flagPart = flags.Count > 0 ? string.Join(" ", flags) + " " : string.Empty;
-
-        return $"cp {flagPart}{source} {destination}";
-    }
-
-    private string BuildMoveCommand(string source, string destination)
-    {
-        if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(destination))
-            return string.Empty;
-
-        var flags = OverwriteExisting ? "-f " : string.Empty;
-        return $"mv {flags}{source} {destination}";
-    }
-
-    private string BuildDeleteCommand(string source)
-    {
-        if (string.IsNullOrWhiteSpace(source))
-            return string.Empty;
-
-        var flags = IncludeSubdirectories ? "-r" : string.Empty;
-        return string.IsNullOrEmpty(flags) ? $"rm {source}" : $"rm {flags} {source}";
-    }
-
-    private string BuildCompressCommand(string source, string archivePath)
-    {
-        if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(archivePath))
-            return string.Empty;
-
-        return $"tar -czf {archivePath} {source}";
-    }
-
-    private bool CanExecute()
-    {
-        if (IsBusy)
-            return false;
-
-        if (SelectedOperation == FileOperationType.Delete && !DeleteConfirmation)
-            return false;
-
-        return !string.IsNullOrWhiteSpace(CommandPreview);
-    }
-
-    private async Task ExecuteOperationAsync()
-    {
-        if (string.IsNullOrWhiteSpace(CommandPreview))
-        {
-            Status = "Please fill in required fields first.";
-            return;
-        }
-
-        IsBusy = true;
-        Status = "Running...";
-        Output = string.Empty;
-        Error = string.Empty;
-
-        var result = await _shellService.RunCommandAsync(CommandPreview);
-
-        Output = string.IsNullOrWhiteSpace(result.StdOutput)
-            ? "(no standard output)"
-            : result.StdOutput;
-
-        Error = string.IsNullOrWhiteSpace(result.StdError)
-            ? "(no error output)"
-            : result.StdError;
-
-        Status = result.IsSuccess
-            ? $"Completed in {result.Duration.TotalSeconds:F2}s (exit code {result.ExitCode})."
-            : $"Failed in {result.Duration.TotalSeconds:F2}s (exit code {result.ExitCode}).";
-
-        IsBusy = false;
     }
 }

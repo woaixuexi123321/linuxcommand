@@ -1,23 +1,41 @@
-﻿namespace LinuxCommandCenter.ViewModels;
+﻿using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
 
-public class NavigationItemViewModel : ViewModelBase
+namespace LinuxCommandCenter.ViewModels
 {
-    private bool _isSelected;
-
-    public NavigationItemViewModel(string title, string subtitle, ViewModelBase viewModel)
+    public class NavigationItemViewModel : ViewModelBase
     {
-        Title = title;
-        Subtitle = subtitle;
-        ViewModel = viewModel;
-    }
+        private string _name = string.Empty;
+        private string _icon = string.Empty;
+        private bool _isSelected;
+        private Type? _viewModelType;
 
-    public string Title { get; }
-    public string Subtitle { get; }
-    public ViewModelBase ViewModel { get; }
+        public string Name
+        {
+            get => _name;
+            set => SetField(ref _name, value);
+        }
 
-    public bool IsSelected
-    {
-        get => _isSelected;
-        set => SetProperty(ref _isSelected, value);
+        public string Icon
+        {
+            get => _icon;
+            set => SetField(ref _icon, value);
+        }
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => SetField(ref _isSelected, value);
+        }
+
+        public Type? ViewModelType
+        {
+            get => _viewModelType;
+            set => SetField(ref _viewModelType, value);
+        }
+
+        public ICommand? OnSelectedCommand { get; set; }
     }
 }

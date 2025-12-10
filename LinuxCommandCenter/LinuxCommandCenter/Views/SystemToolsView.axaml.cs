@@ -1,11 +1,19 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 
-namespace LinuxCommandCenter.Views;
-
-public partial class SystemToolsView : UserControl
+namespace LinuxCommandCenter.Views
 {
-    public SystemToolsView()
+    public partial class SystemToolsView : UserControl
     {
-        InitializeComponent();
+        public SystemToolsView()
+        {
+            InitializeComponent();
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
     }
 }

@@ -1,33 +1,70 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
-namespace LinuxCommandCenter.Models;
-
-public class CommandPreset
+namespace LinuxCommandCenter.Models
 {
-    public string Id { get; }
-    public string Name { get; }
-    public string Category { get; }
-    public string CommandTemplate { get; }
-    public string Description { get; }
-    public bool RequiresConfirmation { get; }
-    public bool IsDangerous { get; }
-
-    public CommandPreset(
-        string name,
-        string category,
-        string commandTemplate,
-        string description,
-        bool requiresConfirmation = false,
-        bool isDangerous = false)
+    public class CommandPreset : INotifyPropertyChanged
     {
-        Id = Guid.NewGuid().ToString("N");
-        Name = name;
-        Category = category;
-        CommandTemplate = commandTemplate;
-        Description = description;
-        RequiresConfirmation = requiresConfirmation;
-        IsDangerous = isDangerous;
-    }
+        private string _name;
+        private string _command;
+        private string _description;
+        private string _category;
+        private bool _requiresSudo;
+        private bool _isFavorite;
 
-    public override string ToString() => Name;
+        public string Name
+        {
+            get => _name;
+            set => SetField(ref _name, value);
+        }
+
+        public string Command
+        {
+            get => _command;
+            set => SetField(ref _command, value);
+        }
+
+        public string Description
+        {
+            get => _description;
+            set => SetField(ref _description, value);
+        }
+
+        public string Category
+        {
+            get => _category;
+            set => SetField(ref _category, value);
+        }
+
+        public bool RequiresSudo
+        {
+            get => _requiresSudo;
+            set => SetField(ref _requiresSudo, value);
+        }
+
+        public bool IsFavorite
+        {
+            get => _isFavorite;
+            set => SetField(ref _isFavorite, value);
+        }
+
+        public List<string> Arguments { get; set; } = new();
+        public Dictionary<string, string> Parameters { get; set; } = new();
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+    }
 }
